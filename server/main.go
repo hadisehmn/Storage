@@ -1,19 +1,26 @@
 package main
 
 import (
-	"go-practice/STORAGE/internal/user"
 	"log"
 	"net/http"
+
+	"go-practice/STORAGE/internal/auth"
+	"go-practice/STORAGE/internal/auth/services"
 )
 
 func main() {
 
-	storageController := &user.StorageController{}
+	userService := services.NewUserService()
+	userController := auth.NewUserController(userService)
 
 	mux := http.NewServeMux()
 
-	mux.HandleFunc("POST /storage/upload", storageController.Upload)
+	mux.HandleFunc("POST /signin", userController.SignIn)
 
 	log.Println("Server is running on :8080")
-	http.ListenAndServe(":8080", mux)
+
+	err := http.ListenAndServe(":8080", mux)
+	if err != nil {
+		log.Fatal(err)
+	}
 }
