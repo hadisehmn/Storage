@@ -7,21 +7,21 @@ import (
 	"net/http"
 
 	"go-practice/STORAGE/internal/apperror"
-	"go-practice/STORAGE/internal/auth/services"
 	models "go-practice/STORAGE/internal/model"
 )
 
-type UserController struct {
-	service *services.UserService
+type AuthController struct {
+	service *AuthService
 }
 
-func NewUserController(service *services.UserService) *UserController {
-	return &UserController{
+func NewAuthController(service *AuthService) *AuthController {
+	return &AuthController{
 		service: service,
 	}
 }
 
-func (c *UserController) SignIn(w http.ResponseWriter, r *http.Request) {
+func (c *AuthController) SignIn(w http.ResponseWriter, r *http.Request) {
+
 	if r.Method != http.MethodPost {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
@@ -37,6 +37,7 @@ func (c *UserController) SignIn(w http.ResponseWriter, r *http.Request) {
 
 	userID, err := c.service.SignIn(req)
 	if err != nil {
+
 		log.Printf("SignIn failed: %v", err)
 
 		switch {
@@ -64,5 +65,41 @@ func (c *UserController) SignIn(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(map[string]string{
 		"message": "login successful",
 		"token":   token,
+	})
+}
+
+func (c *AuthController) SignUp(w http.ResponseWriter, r *http.Request) {
+
+	if r.Method != http.MethodPost {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	var req models.SignUpRequest
+
+	err := json.NewDecoder(r.Body).Decode(&req)
+	if err != nil {
+		http.Error(w, "Invalid request body", http.StatusBadRequest)
+		return
+	}
+
+	userID, err := c.service.SignUp(req)
+	if err != nil {
+		log.Printf("SignUp failed: %v", err)
+
+		http.Error(
+			w,
+			"Signup failed",
+			http.StatusInternalServerError,
+		)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusCreated)
+
+	json.NewEncoder(w).Encode(map[string]string{
+		"message": "signup successful",
+		"user_id": userID,
 	})
 }
