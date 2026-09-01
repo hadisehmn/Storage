@@ -1,13 +1,21 @@
 package main
 
 import (
+	"context"
 	"log"
 	"net/http"
 
 	"go-practice/STORAGE/internal/auth"
+	"go-practice/STORAGE/internal/database"
 )
 
 func main() {
+
+	db, err := database.Connect()
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer db.Close(context.Background())
 
 	authService := auth.NewAuthService()
 	authController := auth.NewAuthController(authService)
@@ -19,7 +27,7 @@ func main() {
 
 	log.Println("Server is running on :8080")
 
-	err := http.ListenAndServe(":8080", mux)
+	err = http.ListenAndServe(":8080", mux)
 	if err != nil {
 		log.Fatal(err)
 	}
