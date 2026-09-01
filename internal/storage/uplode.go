@@ -8,7 +8,5 @@ func (s *StorageService) Upload(
 	header *multipart.FileHeader,
 ) error {
 
-	// منطق واقعی Upload
-
 	return nil
 }
