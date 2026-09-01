@@ -5,17 +5,17 @@ import (
 	"net/http"
 
 	"go-practice/STORAGE/internal/auth"
-	"go-practice/STORAGE/internal/auth/services"
 )
 
 func main() {
 
-	userService := services.NewUserService()
-	userController := auth.NewUserController(userService)
+	authService := auth.NewAuthService()
+	authController := auth.NewAuthController(authService)
 
 	mux := http.NewServeMux()
 
-	mux.HandleFunc("POST /signin", userController.SignIn)
+	mux.HandleFunc("POST /signup", authController.SignUp)
+	mux.HandleFunc("POST /signin", authController.SignIn)
 
 	log.Println("Server is running on :8080")
 
