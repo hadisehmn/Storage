@@ -19,7 +19,6 @@ const maxFileSize = 100 << 20
 
 func (c *StorageController) Upload(w http.ResponseWriter, r *http.Request) {
 
-	// 1. گرفتن userID از context
 	userID, ok := auth.UserIDFromContext(r.Context())
 	if !ok {
 		http.Error(
@@ -30,14 +29,12 @@ func (c *StorageController) Upload(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// 2. محدود کردن حجم Request
 	r.Body = http.MaxBytesReader(
 		w,
 		r.Body,
 		maxFileSize,
 	)
 
-	// 3. گرفتن فایل از HTTP Request
 	file, header, err := r.FormFile("file")
 	if err != nil {
 		http.Error(
@@ -50,7 +47,6 @@ func (c *StorageController) Upload(w http.ResponseWriter, r *http.Request) {
 
 	defer file.Close()
 
-	// 4. فعلاً فقط برای اینکه ببینیم اطلاعات درست گرفته شده
 	_ = userID
 	_ = header
 	_ = file
@@ -68,12 +64,4 @@ func (c *StorageController) Upload(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte("file received"))
-}
-
-func (c *StorageController) Get(w http.ResponseWriter, r *http.Request) {
-	// HTTP مربوط به Get
-}
-
-func (c *StorageController) Delete(w http.ResponseWriter, r *http.Request) {
-	// HTTP مربوط به Delete
 }
