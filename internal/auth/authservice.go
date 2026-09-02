@@ -5,18 +5,20 @@ import (
 	"strings"
 
 	"go-practice/STORAGE/internal/apperror"
+	"go-practice/STORAGE/internal/auth/user"
 	models "go-practice/STORAGE/internal/model"
 
+	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
 )
 
 type AuthService struct {
-	users map[string]models.User
+	repository *user.UserRepository
 }
 
-func NewAuthService() *AuthService {
+func NewAuthService(repository *user.UserRepository) *AuthService {
 	return &AuthService{
-		users: make(map[string]models.User),
+		repository: repository,
 	}
 }
 
@@ -34,14 +36,6 @@ func (s *AuthService) SignUp(req models.SignUpRequest) (string, error) {
 		return "", errors.New("password is required")
 	}
 
-	for _, user := range s.users {
-		if user.Email == req.Email {
-			return "", errors.New("email already exists")
-		}
-	}
-
-	userID := "user-" + string(rune(len(s.users)+1+'0'))
-
 	passwordHash, err := bcrypt.GenerateFromPassword(
 		[]byte(req.Password),
 		bcrypt.DefaultCost,
@@ -51,34 +45,34 @@ func (s *AuthService) SignUp(req models.SignUpRequest) (string, error) {
 	}
 
 	user := models.User{
-		ID:           userID,
-		Name:         req.Name,
-		Email:        req.Email,
+		ID:           uuid.New().String(),
+		Name:         strings.TrimSpace(req.Name),
+		Email:        strings.TrimSpace(req.Email),
 		PasswordHash: string(passwordHash),
 	}
-	s.users[userID] = user
 
-	return userID, nil
+	if err := s.repository.Create(user); err != nil {
+		return "", err
+	}
+
+	return user.ID, nil
 }
 
 func (s *AuthService) SignIn(req models.SignInRequest) (string, error) {
 
-	for _, user := range s.users {
-
-		if user.Email == req.Email {
-
-			err := bcrypt.CompareHashAndPassword(
-				[]byte(user.PasswordHash),
-				[]byte(req.Password),
-			)
-
-			if err != nil {
-				return "", apperror.ErrWrongPassword
-			}
-
-			return user.ID, nil
-		}
+	user, err := s.repository.FindByEmail(req.Email)
+	if err != nil {
+		return "", apperror.ErrUserNotFound
 	}
 
-	return "", apperror.ErrUserNotFound
+	err = bcrypt.CompareHashAndPassword(
+		[]byte(user.PasswordHash),
+		[]byte(req.Password),
+	)
+
+	if err != nil {
+		return "", apperror.ErrWrongPassword
+	}
+
+	return user.ID, nil
 }
