@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"go-practice/STORAGE/internal/auth"
+	"go-practice/STORAGE/internal/auth/user"
 	"go-practice/STORAGE/internal/database"
 
 	"github.com/joho/godotenv"
@@ -23,7 +24,10 @@ func main() {
 	}
 	defer db.Close(context.Background())
 
-	authService := auth.NewAuthService()
+	userRepository := user.NewUserRepository(db)
+
+	authService := auth.NewAuthService(userRepository)
+
 	authController := auth.NewAuthController(authService)
 
 	mux := http.NewServeMux()
