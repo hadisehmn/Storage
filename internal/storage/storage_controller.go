@@ -1,6 +1,7 @@
 package storage
 
 import (
+	"encoding/json"
 	"go-practice/STORAGE/internal/auth"
 	"net/http"
 )
@@ -64,4 +65,22 @@ func (c *StorageController) Upload(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte("file received"))
+}
+
+func (c *StorageController) List(w http.ResponseWriter, r *http.Request) {
+
+	userID, ok := auth.UserIDFromContext(r.Context())
+	if !ok {
+		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+		return
+	}
+
+	files, err := c.service.GetUserFiles(userID)
+	if err != nil {
+		http.Error(w, "failed to get files", http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(files)
 }
