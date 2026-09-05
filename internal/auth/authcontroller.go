@@ -22,11 +22,6 @@ func NewAuthController(service *AuthService) *AuthController {
 
 func (c *AuthController) SignIn(w http.ResponseWriter, r *http.Request) {
 
-	if r.Method != http.MethodPost {
-		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
-		return
-	}
-
 	var req models.SignInRequest
 
 	err := json.NewDecoder(r.Body).Decode(&req)
@@ -63,18 +58,15 @@ func (c *AuthController) SignIn(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 
-	json.NewEncoder(w).Encode(map[string]string{
-		"message": "login successful",
-		"token":   token,
-	})
+	response := models.SignInResponse{
+		Message: "login successful",
+		Token:   token,
+	}
+
+	json.NewEncoder(w).Encode(response)
 }
 
 func (c *AuthController) SignUp(w http.ResponseWriter, r *http.Request) {
-
-	if r.Method != http.MethodPost {
-		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
-		return
-	}
 
 	var req models.SignUpRequest
 
