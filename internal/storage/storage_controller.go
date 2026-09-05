@@ -2,8 +2,10 @@ package storage
 
 import (
 	"encoding/json"
-	"go-practice/STORAGE/internal/auth"
 	"net/http"
+
+	"go-practice/STORAGE/internal/auth"
+	models "go-practice/STORAGE/internal/model"
 )
 
 type StorageController struct {
@@ -81,6 +83,16 @@ func (c *StorageController) List(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	response := make([]models.FileResponse, 0, len(files))
+
+	for _, file := range files {
+		response = append(response, models.FileResponse{
+			ID:        file.ID,
+			FileName:  file.FileName,
+			CreatedAt: file.CreatedAt,
+		})
+	}
+
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(files)
+	json.NewEncoder(w).Encode(response)
 }

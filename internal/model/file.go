@@ -9,3 +9,9 @@ type File struct {
 	FilePath  string
 	CreatedAt time.Time
 }
+
+type FileResponse struct {
+	ID        string    `json:"id"`
+	FileName  string    `json:"file_name"`
+	CreatedAt time.Time `json:"created_at"`
+}
