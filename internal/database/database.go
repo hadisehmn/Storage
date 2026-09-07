@@ -8,7 +8,6 @@ import (
 )
 
 func Connect() (*pgx.Conn, error) {
-
 	conn, err := pgx.Connect(
 		context.Background(),
 		os.Getenv("DATABASE_URL"))

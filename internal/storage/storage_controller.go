@@ -120,3 +120,32 @@ func (c *StorageController) Delete(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusNoContent)
 }
+
+func (c *StorageController) Download(w http.ResponseWriter, r *http.Request) {
+
+	userID, ok := auth.UserIDFromContext(r.Context())
+	if !ok {
+		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+		return
+	}
+
+	fileID := r.PathValue("id")
+
+	if fileID == "" {
+		http.Error(w, "file id is required", http.StatusBadRequest)
+		return
+	}
+
+	file, err := c.service.DownloadFile(fileID, userID)
+	if err != nil {
+		http.Error(w, "file not found", http.StatusNotFound)
+		return
+	}
+
+	w.Header().Set(
+		"Content-Disposition",
+		`attachment; filename="`+file.FileName+`"`,
+	)
+
+	http.ServeFile(w, r, file.FilePath)
+}
