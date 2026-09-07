@@ -49,6 +49,11 @@ func main() {
 		auth.Authentication(http.HandlerFunc(storageController.List)),
 	)
 
+	mux.Handle(
+		"DELETE /files/{id}",
+		auth.Authentication(http.HandlerFunc(storageController.Delete)),
+	)
+
 	log.Println("Server is running on :8080")
 
 	err = http.ListenAndServe(":8080", mux)
