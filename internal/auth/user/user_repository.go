@@ -21,9 +21,7 @@ func NewUserRepository(db *pgx.Conn) *UserRepository {
 func (r *UserRepository) Create(user model.User) error {
 	_, err := r.db.Exec(
 		context.Background(),
-		`INSERT INTO users
-			(id, name, email, password_hash)
-		 VALUES ($1, $2, $3, $4)`,
+		`INSERT INTO users(id, name, email, password_hash)VALUES ($1, $2, $3, $4)`,
 		user.ID,
 		user.Name,
 		user.Email,
@@ -38,9 +36,7 @@ func (r *UserRepository) FindByEmail(email string) (*model.User, error) {
 
 	err := r.db.QueryRow(
 		context.Background(),
-		`SELECT id, name, email, password_hash
-		 FROM users
-		 WHERE email = $1`,
+		`SELECT id, name, email, password_hash FROM users WHERE email = $1`,
 		email,
 	).Scan(
 		&user.ID,

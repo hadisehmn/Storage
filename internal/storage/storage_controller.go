@@ -96,3 +96,27 @@ func (c *StorageController) List(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(response)
 }
+
+func (c *StorageController) Delete(w http.ResponseWriter, r *http.Request) {
+
+	userID, ok := auth.UserIDFromContext(r.Context())
+	if !ok {
+		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+		return
+	}
+
+	fileID := r.PathValue("id")
+
+	if fileID == "" {
+		http.Error(w, "file id is required", http.StatusBadRequest)
+		return
+	}
+
+	err := c.service.DeleteFile(fileID, userID)
+	if err != nil {
+		http.Error(w, "failed to delete file", http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusNoContent)
+}

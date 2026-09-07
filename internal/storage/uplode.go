@@ -11,11 +11,7 @@ import (
 	models "go-practice/STORAGE/internal/model"
 )
 
-func (s *StorageService) Upload(
-	userID string,
-	file multipart.File,
-	header *multipart.FileHeader,
-) error {
+func (s *StorageService) Upload(userID string, file multipart.File, header *multipart.FileHeader) error {
 
 	fileID := uuid.New().String()
 

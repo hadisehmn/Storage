@@ -22,9 +22,7 @@ func (r *StorageRepository) Create(file models.File) error {
 
 	_, err := r.db.Exec(
 		context.Background(),
-		`INSERT INTO files
-			(id, user_id, file_name, file_path, created_at)
-		 VALUES ($1, $2, $3, $4, $5)`,
+		`INSERT INTO files(id, user_id, file_name, file_path, created_at)  VALUES ($1, $2, $3, $4, $5)`,
 		file.ID,
 		file.UserID,
 		file.FileName,
@@ -39,10 +37,7 @@ func (r *StorageRepository) FindByUserID(userID string) ([]models.File, error) {
 
 	rows, err := r.db.Query(
 		context.Background(),
-		`SELECT id, user_id, file_name, file_path, created_at
-		 FROM files
-		 WHERE user_id = $1
-		 ORDER BY created_at DESC`,
+		`SELECT id, user_id, file_name, file_path, created_at FROM files WHERE user_id = $1 ORDER BY created_at DESC`,
 		userID,
 	)
 
@@ -76,4 +71,39 @@ func (r *StorageRepository) FindByUserID(userID string) ([]models.File, error) {
 	}
 
 	return files, nil
+}
+
+func (r *StorageRepository) FindByIDAndUserID(fileID string, userID string) (*models.File, error) {
+
+	var file models.File
+	err := r.db.QueryRow(
+		context.Background(),
+		`SELECT id, user_id, file_name, file_path, created_at FROM files WHERE id = $1 AND user_id = $2`,
+		fileID,
+		userID,
+	).Scan(
+		&file.ID,
+		&file.UserID,
+		&file.FileName,
+		&file.FilePath,
+		&file.CreatedAt,
+	)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &file, nil
+}
+
+func (r *StorageRepository) Delete(fileID string, userID string) error {
+
+	_, err := r.db.Exec(
+		context.Background(),
+		`DELETE FROM files WHERE id = $1 AND user_id = $2`,
+		fileID,
+		userID,
+	)
+
+	return err
 }
