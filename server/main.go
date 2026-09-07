@@ -54,6 +54,11 @@ func main() {
 		auth.Authentication(http.HandlerFunc(storageController.Delete)),
 	)
 
+	mux.Handle(
+		"GET /files/{id}/download",
+		auth.Authentication(http.HandlerFunc(storageController.Download)),
+	)
+
 	log.Println("Server is running on :8080")
 
 	err = http.ListenAndServe(":8080", mux)
