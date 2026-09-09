@@ -84,12 +84,12 @@ func (c *StorageController) List(w http.ResponseWriter, r *http.Request) {
 	}
 
 	response := make([]models.FileResponse, 0, len(files))
-
 	for _, file := range files {
 		response = append(response, models.FileResponse{
-			ID:        file.ID,
-			FileName:  file.FileName,
-			CreatedAt: file.CreatedAt,
+			ID:          file.ID,
+			FileName:    file.FileName,
+			CreatedAt:   file.CreatedAt,
+			DownloadURL: "http://localhost:8080/files/" + file.ID + "/download",
 		})
 	}
 

@@ -11,7 +11,8 @@ type File struct {
 }
 
 type FileResponse struct {
-	ID        string    `json:"id"`
-	FileName  string    `json:"file_name"`
-	CreatedAt time.Time `json:"created_at"`
+	ID          string    `json:"id"`
+	FileName    string    `json:"file_name"`
+	CreatedAt   time.Time `json:"created_at"`
+	DownloadURL string    `json:"download_url"`
 }
