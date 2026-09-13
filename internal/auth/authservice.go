@@ -60,6 +60,14 @@ func (s *AuthService) SignUp(req models.SignUpRequest) (string, error) {
 
 func (s *AuthService) SignIn(req models.SignInRequest) (string, error) {
 
+	if req.Email == "" {
+		return "", errors.New("email is required")
+	}
+
+	if req.Password == "" {
+		return "", errors.New("password is required")
+	}
+
 	user, err := s.repository.FindByEmail(req.Email)
 	if err != nil {
 		return "", apperror.ErrUserNotFound
