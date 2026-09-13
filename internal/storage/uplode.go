@@ -1,6 +1,7 @@
 package storage
 
 import (
+	"errors"
 	"io"
 	"mime/multipart"
 	"os"
@@ -12,6 +13,10 @@ import (
 )
 
 func (s *StorageService) Upload(userID string, file multipart.File, header *multipart.FileHeader) error {
+
+	if userID == "" {
+		return errors.New("user id is required")
+	}
 
 	fileID := uuid.New().String()
 
