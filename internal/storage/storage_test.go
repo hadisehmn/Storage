@@ -133,3 +133,6 @@ func TestUpload(t *testing.T) {
 		})
 	}
 }
+
+func TestDelet(t *testing.T) {
+}
