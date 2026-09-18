@@ -23,12 +23,11 @@ func TestMain(m *testing.M) {
 	}
 
 	err = godotenv.Load(
-		filepath.Join(root, "../../server/.env"),
+		filepath.Join(root, "../../server/.env.test"),
 	)
 	if err != nil {
 		panic(err)
 	}
-
 	os.Exit(m.Run())
 }
 
