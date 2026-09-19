@@ -66,8 +66,7 @@ jobs:
 
       - name: Push Docker image
         run: docker push hadi3eh/storage:${{ github.sha }}
-
-    deploy:
+          deploy:
     name: Deploy to Server
     needs: docker
     runs-on: ubuntu-latest
@@ -87,24 +86,47 @@ jobs:
             -i ~/.ssh/deploy_key \
             -o StrictHostKeyChecking=no \
             ubuntu@batman.dumas.ir \
-            "whoami && hostname"
+            "whoami && hostname && docker --version"
+            
 
-      - name: Deploy via SSH
-        uses: appleboy/ssh-action@v1
-        with:
-          host: ${{ secrets.SERVER_HOST }}
-          username: ${{ secrets.SERVER_USER }}
-          key: ${{ secrets.SERVER_SSH_KEY }}
-          debug: true
+    # deploy:
+    # name: Deploy to Server
+    # needs: docker
+    # runs-on: ubuntu-latest
 
-          script: |
-            docker pull hadi3eh/storage:${{ github.sha }}
+    # steps:
+    #   - name: Test SSH connection
+    #     env:
+    #       SSH_KEY: ${{ secrets.SERVER_SSH_KEY }}
+    #     run: |
+    #       mkdir -p ~/.ssh
+    #       printf '%s\n' "$SSH_KEY" > ~/.ssh/deploy_key
+    #       chmod 600 ~/.ssh/deploy_key
 
-            docker stop storage || true
-            docker rm storage || true
+    #       ssh-keygen -lf ~/.ssh/deploy_key
 
-            docker run -d \
-              --name storage \
-              --restart unless-stopped \
-              -p 8080:8080 \
-              hadi3eh/storage:${{ github.sha }}
+    #       ssh \
+    #         -i ~/.ssh/deploy_key \
+    #         -o StrictHostKeyChecking=no \
+    #         ubuntu@batman.dumas.ir \
+    #         "whoami && hostname"
+
+    #   - name: Deploy via SSH
+    #     uses: appleboy/ssh-action@v1
+    #     with:
+    #       host: ${{ secrets.SERVER_HOST }}
+    #       username: ${{ secrets.SERVER_USER }}
+    #       key: ${{ secrets.SERVER_SSH_KEY }}
+    #       debug: true
+
+    #       script: |
+    #         docker pull hadi3eh/storage:${{ github.sha }}
+
+    #         docker stop storage || true
+    #         docker rm storage || true
+
+    #         docker run -d \
+    #           --name storage \
+    #           --restart unless-stopped \
+    #           -p 8080:8080 \
+    #           hadi3eh/storage:${{ github.sha }}
