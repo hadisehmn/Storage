@@ -44,6 +44,7 @@ jobs:
 
       - name: Run Go tests
         run: go test ./...
+     
 
   docker:
     name: Build and Push Docker Image
@@ -65,8 +66,7 @@ jobs:
 
       - name: Push Docker image
         run: docker push hadi3eh/storage:${{ github.sha }}
-
-  deploy:
+          deploy:
     name: Deploy to Server
     needs: docker
     runs-on: ubuntu-latest
@@ -87,6 +87,7 @@ jobs:
             -o StrictHostKeyChecking=no \
             ubuntu@batman.dumas.ir \
             "whoami && hostname && docker --version"
+            
 
     # deploy:
     # name: Deploy to Server
